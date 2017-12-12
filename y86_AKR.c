@@ -56,7 +56,7 @@ int parse(FILE * f)
     else
     { /* c0af   c 0af  c0 af  c0a f */
         printf("Opened input file\n");
-        fread(p, strlen(p)+1, 1, f);
+        fread(p, 2000, 1, f);
         fclose(f);
         // while ((c = fgetc(f)) != EOF )
         // {
