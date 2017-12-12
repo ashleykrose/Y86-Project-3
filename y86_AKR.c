@@ -55,15 +55,18 @@ int parse(FILE * f)
     }
     else
     { /* c0af   c 0af  c0 af  c0a f */
+        printf("Opened input file\n");
         while ((c = fgetc(f)) != EOF )
         {
             char t = fgetc(f);
+            printf("%c\n", t);
             c = toHex(c);
             t = toHex(t);
             p[i] = c<<4 | t;
             i++; programLength++;
             printf("%x ", p[i] & 0xff);
         }
+        printf("End of input file\n");
     }
     printf("\n");
     fclose(f);
@@ -722,7 +725,7 @@ void addl(char reg)
     int tmp = *dst;
     *dst = *dst + *src;
     printf("addl rA, rB: (%x)", *dst);
-    setFlags(tmp, *src, *dst);
+    setFlags(tmp, *src, *dst, 0);
     pc+=2;
 }
 
