@@ -56,7 +56,7 @@ int parse(FILE * f)
     else
     { /* c0af   c 0af  c0 af  c0a f */
         printf("Opened input file\n");
-        fread(p, 2000, 1, f);
+        programLength = fread(p, 1, 2000, f);
         fclose(f);
         // while ((c = fgetc(f)) != EOF )
         // {
@@ -75,14 +75,14 @@ int parse(FILE * f)
     return 0;
 }
 
-char toHex(char x)
-{
-    if (x > '/' && x < ':') /* 0-9 */
-        x = (x - 48);
-    else if (x > '`' && x < 'g') /* a-f */
-        x = (x-87);
-    return x;
-}
+// char toHex(char x)
+// {
+//     if (x > '/' && x < ':') /* 0-9 */
+//         x = (x - 48);
+//     else if (x > '`' && x < 'g') /* a-f */
+//         x = (x-87);
+//     return x;
+// }
 
 /* Decodes the string of byte-sized characters and executes them **********
 *************************************************************************/
@@ -95,7 +95,7 @@ int decode()
     */
 
     /*
-    TODO 2: Implement this function so it reads from a binary file
+    TO DO 2: Implement this function so it reads from a binary file
     rather than from ASCII characters that represent binary digits like
     it does now
     */
