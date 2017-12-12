@@ -10,17 +10,16 @@ int num_words;
 int *eax, *ecx, *edx, *ebx, *esi, *edi, *esp, *ebp, pc;
 char codes; /* status, condition codes[3]; control and status flags */
 
-
 /* Program start */
 int main(int argc, char ** argv)
-{   
+{
     setup();
     char *input = argv[1];
     FILE * f;
-    /* 
-    TODO 1: read the file in as a binary file 
-    */
-    f = fopen(input, "r"); 
+    //
+    // TO DO 1: read the file in as a binary file
+    //
+    f = fopen(input, "rb");
     printf("Opened file %s\n", input);
     parse(f);
     printf("Parsed %s\n", input);
@@ -71,7 +70,6 @@ int parse(FILE * f)
     return 0;
 }
 
-
 char toHex(char x)
 {
     if (x > '/' && x < ':') /* 0-9 */
@@ -80,11 +78,6 @@ char toHex(char x)
         x = (x-87);
     return x;
 }
-
-
-
-
-
 
 /* Decodes the string of byte-sized characters and executes them **********
 *************************************************************************/
@@ -96,10 +89,10 @@ int decode()
         - call function with right operands
     */
 
-    /* 
-    TODO 2: Implement this function so it reads from a binary file 
-    rather than from ASCII characters that represent binary digits like 
-    it does now 
+    /*
+    TODO 2: Implement this function so it reads from a binary file
+    rather than from ASCII characters that represent binary digits like
+    it does now
     */
 
     for (pc=0; pc<programLength; )
@@ -139,7 +132,7 @@ int decode()
             {
                 printf("%x %x \t\t", p[pc]&0xff, p[pc+1]&0xff);
                 char reg = p[pc+1];
-                /* l=4, mov 
+                /* l=4, mov
                     rrmovl rA, rb     20 rArB
                     cmovle rA, rb     21 rArB
                     cmovl rA, rb      22 rArB
@@ -175,7 +168,7 @@ int decode()
                 else if ((p[pc]&0x0f) == 0x6)
                 {
                     cmovg(reg);
-                } else 
+                } else
                 {
                     setINS();
                     error("Error interpreting mov at pc=%x", pc);
@@ -188,7 +181,7 @@ int decode()
                 /* irmovl V, rb      30 FrB V[4] */
                if ((p[pc] & 0x0f) == 0x0)
                {
-                printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff, 
+                printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff,
                     p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff, p[pc+5]&0xff);
                 int val = getVal(p[pc+2], p[pc+3], p[pc+4], p[pc+5]);
                 irmovl(val, p[pc+1]);
@@ -205,8 +198,8 @@ int decode()
                 /* rmmovl rA, D(rB)  40 rArB D[4] */
                 if ((p[pc]&0x0f) == 0x0)
                 {
-                    printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff, 
-                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff, p[pc+5]&0xff);                    
+                    printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff,
+                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff, p[pc+5]&0xff);
                     int data = getVal(p[pc+2], p[pc+3], p[pc+4], p[pc+5]);
                     rmmovl(p[pc+1], data);
                 } else
@@ -222,8 +215,8 @@ int decode()
                 /*     mrmovl D(rB), rA     50 rArB D[4] */
                 if ((p[pc]&0x0f) == 0x0)
                 {
-                    printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff, 
-                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff, p[pc+5]&0xff);                    
+                    printf("%x %x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff,
+                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff, p[pc+5]&0xff);
                     int data = getVal(p[pc+2], p[pc+3], p[pc+4], p[pc+5]);
                     mrmovl(p[pc+1], data);
                 } else
@@ -238,7 +231,7 @@ int decode()
                 printf("%x %x \t\t", p[pc]&0xff, p[pc+1]&0xff);
                 char reg = p[pc+1];
                 /* l=4, op */
-                /* 
+                /*
                 addl rA, rB       60 rArB
                 subl rA, rB       61 rArB
                 andl rA, rB       62 rArB
@@ -266,8 +259,8 @@ int decode()
             case 0x70:
             {
                 /* l=8, jmps */
-                printf("%x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff, 
-                    p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff);                    
+                printf("%x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff,
+                    p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff);
                 int dest = getVal(p[pc+1], p[pc+2], p[pc+3], p[pc+4]);
                 /*
                 jmp Dest          70 Dest[4]
@@ -299,7 +292,7 @@ int decode()
                 } else if ((p[pc]&0x0f) == 0x6)
                 {
                     jg(dest);
-                } else 
+                } else
                 {
                     setINS();
                     error("Error interpreting jump at pc=%x", pc);
@@ -312,11 +305,11 @@ int decode()
                 /*     call  80 Dest[4] */
                 if ((p[pc]&0x0f) == 0x0)
                 {
-                    printf("%x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff, 
-                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff);                    
+                    printf("%x %x %x %x %x\t", p[pc]&0xff, p[pc+1]&0xff,
+                        p[pc+2]&0xff, p[pc+3]&0xff, p[pc+4]&0xff);
                     int dest = getVal(p[pc+1], p[pc+2], p[pc+3], p[pc+4]);
-                    call(dest);                
-                } else 
+                    call(dest);
+                } else
                 {
                     setINS();
                     error("Error interpreting call at pc=%x", pc);
@@ -346,8 +339,8 @@ int decode()
                 {
                     printf("%x %x \t\t", p[pc]&0xff, p[pc+1]&0xff);
                     pushl(p[pc+1]&0xf0);
-                } else 
-                {   
+                } else
+                {
                     setINS();
                     error("Error interpreting pushl at pc=%x", pc);
                 }
@@ -379,56 +372,6 @@ int decode()
     return 0;
 }
 
-
-
-/* Sample program (in the root directory as prog.o)
-0x00:
-    30f400010000 -> 30 f4 00 01 00 00
-    30f500010000 -> 30 f5 00 01 00 00
-    8024000000   -> 80 24 00 00 00 00
-    00           -> 00
-
-0x014:
-    0d000000     -> 0d 00 00 00
-    c0000000     -> c0 00 00 00 
-    000b0000     -> 00 0b 00 00
-    00a00000     -> 00 a0 00 00
-
-0x024:
-    a05f         -> a0 5f
-    2045         -> 20 45
-    30f004000000 -> 30 f0 04 00 00 00
-    a00f         -> a0 0f
-    30f214000000 -> 30 f2 14 00 00 00
-    a02f         -> a0 2f
-    8042000000   -> 80 42 00 00 00
-    2054         -> 20 54
-    b05f         -> b0 5f
-    90           -> 90
-
-0x42:
-    a05f         -> a0 5f
-    2045         -> 20 45
-    501508000000 -> 50 15 08 00 00 00
-    50250c000000 -> 50 25 0c 00 00 00
-    6300         -> 63 00
-    6222         -> 62 22
-    7378000000   -> 73 78 00 00 00
-    506100000000 -> 50 61 00 00 00 00 
-    6060         -> 60 60 
-    30f304000000 -> 30 f3 04 00 00 00 
-    6031         -> 60 31
-    30f3ffffffff -> 30 f3 ff ff ff ff
-    6032         -> 60 32
-    745b000000   -> 74 5b 00 00 00 
-    2054         -> 20 54
-    b05f         -> b0 5f
-    90           -> 90
-
-0x100: #stack starts here and grows to lower addresses)
-*/
-
-
 /*
     x | ZF | SF | OF |  1 | 1 | 1 | 1
     1 AOK  Normal operation
@@ -443,7 +386,7 @@ int decode()
 
 /* Zero flag operations */
 void setZF()
-{  
+{
     codes = codes | 64; /* sets the 01000000 flag */
     printf("(ZF)");
 }
@@ -469,7 +412,6 @@ void clearFlags()
     clearOF();
 }
 
-
 /* Sign Flag operations */
 void setSF()
 {
@@ -489,7 +431,6 @@ int getSF()
     return FALSE;
 }
 
-
 /* Overflow flag operations */
 void setOF()
 {
@@ -508,9 +449,6 @@ int getOF()
         return TRUE;
     return FALSE;
 }
-
-
-
 
 /* Status code operations (last four bits) */
 void setAOK()
@@ -539,7 +477,7 @@ void setINS()
 {
     clearStatus();
     codes = codes | 4; /* sets 00000010 */
-    printf("(set status = INS)");  
+    printf("(set status = INS)");
 }
 
 int getStatus()
@@ -553,7 +491,7 @@ void clearStatus()
 }
 
 /**
-**  Gets an integer value from four bytes (based on big 
+**  Gets an integer value from four bytes (based on big
 **   endian or little endian encoding)
 **/
 int getVal(char a, char b, char c, char d)
@@ -577,9 +515,9 @@ int getVal(char a, char b, char c, char d)
     return val;
 }
 
-/* 
-    Computes the register from the first part of the byte 
-    passed in. Returns a pointer to the register given 
+/*
+    Computes the register from the first part of the byte
+    passed in. Returns a pointer to the register given
     character code as input.
     0  eax; 1 ecx; 2 edx; 3  ebx
     4  esp; 5 ebp; 6 esi; 7  edi
@@ -587,7 +525,7 @@ int getVal(char a, char b, char c, char d)
 */
 int * r1(char a)
 {
-//    printf("r2: %x, r2 & 0x0f: %x", a, (a & 0xf0)); 
+//    printf("r2: %x, r2 & 0x0f: %x", a, (a & 0xf0));
     switch (a & 0xf0)
     {
         case 0x00:  return eax;
@@ -598,16 +536,16 @@ int * r1(char a)
         case 0x50:  return ebp;
         case 0x60:  return esi;
         case 0x70:  return edi;
-        case 0xf0:  return 0; 
+        case 0xf0:  return 0;
         default:
             error("Error determining register value. pc=%x", pc);
     }
     return eax; /* shouldn't be hit */
 }
 
-/* 
-    Computes the register from the second part of the byte 
-    passed in. Returns a pointer to the register given 
+/*
+    Computes the register from the second part of the byte
+    passed in. Returns a pointer to the register given
     character code as input.
     0  eax; 1 ecx; 2 edx; 3  ebx
     4  esp; 5 ebp; 6 esi; 7  edi
@@ -626,13 +564,12 @@ int * r2(char a)
         case 0x05:  return ebp;
         case 0x06:  return esi;
         case 0x07:  return edi;
-        case 0x0f:  return 0; 
+        case 0x0f:  return 0;
         default:
             error("Error determining register value. pc=%x", pc);
     }
     return eax; /* shouldn't be hit */
 }
-
 
 /*
 *  Prints out the values of the registers */
@@ -649,26 +586,16 @@ void printRegisters()
     printf("PC:%x \n", pc);
 }
 
-/* Generates an error then exits the program 
-*/ 
+/* Generates an error then exits the program
+*/
 void error(char * words, int pc)
 {
     printf(words);
     exit(1);
 }
 
-
-
-
-
-
-
-
 /* Assembly instructions */
-
-
-
-/**     
+/**
 *    halt              00 */
 void halt()
 {
@@ -679,15 +606,12 @@ void halt()
     exit(0);
 }
 
-
-
 /**  nop               10  */
 void nop()
 {
     printf("nop");
     pc+=1;
 }
-
 
 /**  rrmovl rA, rb     20 rArB   */
 void rrmovl(char reg)
@@ -699,7 +623,6 @@ void rrmovl(char reg)
     pc+=2;
 }
 
-
 /**     cmovle rA, rb     21 rArB  */
 void cmovle(char reg)
 {
@@ -709,11 +632,10 @@ void cmovle(char reg)
     {
         *dst = *src;
         printf("cmovle %x, %x (moved)", *src, *dst);
-    } else 
+    } else
         printf("cmovle %x, %x (not moved)", *src, *dst);
     pc+=2;
 }
-
 
 /**      cmovl rA, rb      22 rArB   */
 void cmovl(char reg)
@@ -729,8 +651,6 @@ void cmovl(char reg)
     pc+=2;
 }
 
-
-
 /**     cmove rA, rB      23 rArB  */
 void cmove(char reg)
 {
@@ -738,37 +658,30 @@ void cmove(char reg)
     int * dst = r2(reg);
     if (getZF() == 1)
     {
-        *dst = *src;   
-        printf("cmove %x, %x (moved)", *src, *dst);    
+        *dst = *src;
+        printf("cmove %x, %x (moved)", *src, *dst);
     } else
-        printf("cmove %x, %x (not moved)", *src, *dst);    
+        printf("cmove %x, %x (not moved)", *src, *dst);
     pc+=2;
 }
-
-
 
 /**     cmovne rA, rB     24 rArB  */
 void cmovne(char reg)
 {
-    /* TODO 3: Implement the cmovne instruction */
+    /* TO DO 3: Implement the cmovne instruction */
 }
-
 
 /**     cmovge rA, rB     25 rArB  */
 void cmovge(char reg)
 {
-    /* TODO 4: Implement the cmovge instruction */
+    /* TO DO 4: Implement the cmovge instruction */
 }
-
 
 /*     cmovg rA, rB      26 rArB   */
 void cmovg(char reg)
 {
-    /* TODO 5: Implement the cmovg instruction */
+    /* TO DO 5: Implement the cmovg instruction */
 }
-
-
-
 
 /**     irmovl V, rb      30 FrB Va Vb Vc Vd  */
 void irmovl(int val, char reg)
@@ -778,8 +691,6 @@ void irmovl(int val, char reg)
     printf("irmovl rB, %x", *rB);
     pc+=6;
 }
-
-
 
 /**     rmmovl rA, D(rB)     40 rArB Da Db Dc Dd  */
 void rmmovl(char reg, int offset)
@@ -791,21 +702,17 @@ void rmmovl(char reg, int offset)
     pc+=6;
 }
 
-
-
-
 /**     mrmovl D(rB), rA      50 rArB Da Db Dc Dd  */
 void mrmovl(char reg, int offset)
 {
-    /* TODO 6: Implement the mrmovl instruction */
+    /* TO DO 6: Implement the mrmovl instruction */
 }
 
 /** Sets flags based on the last result */
 void setFlags(int a, int b, int result, int isAdd)
 {
-    /* TODO 7: Implement the setFlags function */
+    /* TO DO 7: Implement the setFlags function */
 }
-
 
 /**     addl rA, rB          60 rArB  */
 void addl(char reg)
@@ -819,27 +726,23 @@ void addl(char reg)
     pc+=2;
 }
 
-
 /**      subl rA, rB        61 rArB  */
 void subl(char reg)
 {
-    /* TODO 8: Implement the subl instruction */
+    /* TO DO 8: Implement the subl instruction */
 }
-
 
 /**     andl rA, rB       62 rArB  */
 void andl(char reg)
 {
-    /* TODO 9: Implement the andl instruction */
+    /* TO DO 9: Implement the andl instruction */
 }
-
 
 /**     xorl rA, rB       63 rArB  */
 void xorl(char reg)
 {
-    /* TODO 10: Implement the xorl instruction */
+    /* TO DO 10: Implement the xorl instruction */
 }
-
 
 /**     jmp Dest          70 Da Db Dc Dd  */
 void jmp(int dest)
@@ -850,21 +753,17 @@ void jmp(int dest)
     pc+=5;
 }
 
-
-
 /**     jle Dest          71 Da Db Dc Dd  */
 void jle(int dest)
 {
-    /* TODO 11: Implement the jle instruction */
+    /* TO DO 11: Implement the jle instruction */
 }
-
 
 /**     jl Dest           72 Da Db Dc Dd  */
 void jl(int dest)
 {
-    /* TODO 12: Implement the jl instruction */
+    /* TO DO 12: Implement the jl instruction */
 }
-
 
 /**     je Dest           73 Da Db Dc Dd  */
 void je(int dest)
@@ -881,7 +780,6 @@ void je(int dest)
     }
 }
 
-
 /**     jne Dest          74 Da Db Dc Dd  */
 void jne(int dest)
 {
@@ -897,26 +795,19 @@ void jne(int dest)
     }
 }
 
-
-
 /**     jge Dest          75 Da Db Dc Dd  */
 void jge(int dest)
 {
-    /* TODO 13: Implement the jge instruction */
+    /* TO DO 13: Implement the jge instruction */
 }
-
-
 
 /**     jg Dest           76 Da Db Dc Dd  */
 void jg(int dest)
 {
-    /* TODO jg: Implement the jg instruction */
+    /* TO DO jg: Implement the jg instruction */
 }
 
-
-
-/* TODO 15: Verify all the other instructions work correctly */
-
+/* TO DO 15: Verify all the other instructions work correctly */
 /*     call              80 Da Db Dc Dd  */
 void call(int addr)
 {
@@ -926,8 +817,6 @@ void call(int addr)
     pc = addr;
 }
 
-
-
 /*     ret               90   */
 void ret()
 {
@@ -936,7 +825,6 @@ void ret()
     *esp = *esp + 0x4; /* move esp back down */
     pc += 5;  /* for how many bytes it took to call */
 }
-
 
 /*     pushl rA          A0 rAF   */
 void pushl(char reg)
@@ -948,7 +836,6 @@ void pushl(char reg)
     pc+=2;
 }
 
-
 /*      popl rA           B0 rAF   */
 void popl(char reg)
 {
@@ -959,9 +846,7 @@ void popl(char reg)
     pc+=2;
 }
 
-
-
-/* TODO: 16: Make sure printMemory prints the ending memory on the screen properly */
+/* TO DO: 16: Make sure printMemory prints the ending memory on the screen properly */
 int printMemory(int start)
 {
     int words_on_screen = 1000;
@@ -975,10 +860,6 @@ int printMemory(int start)
     return 0;
 }
 
-
-
-
-
 /* Sample program (in directory as prog.o)
 0x00:
     30f400010000 -> 30 f4 00 01 00 00
@@ -988,7 +869,7 @@ int printMemory(int start)
 
 0x014:
     0d000000     -> 0d 00 00 00
-    c0000000     -> c0 00 00 00 
+    c0000000     -> c0 00 00 00
     000b0000     -> 00 0b 00 00
     00a00000     -> 00 a0 00 00
 
@@ -1012,21 +893,14 @@ int printMemory(int start)
     6300         -> 63 00
     6222         -> 62 22
     7378000000   -> 73 78 00 00 00
-    506100000000 -> 50 61 00 00 00 00 
-    6060         -> 60 60 
-    30f304000000 -> 30 f3 04 00 00 00 
+    506100000000 -> 50 61 00 00 00 00
+    6060         -> 60 60
+    30f304000000 -> 30 f3 04 00 00 00
     6031         -> 60 31
     30f3ffffffff -> 30 f3 ff ff ff ff
     6032         -> 60 32
-    745b000000   -> 74 5b 00 00 00 
+    745b000000   -> 74 5b 00 00 00
     2054         -> 20 54
     b05f         -> b0 5f
     90           -> 90
-
-
 */
-
-
-
-
-

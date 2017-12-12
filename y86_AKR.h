@@ -63,8 +63,3 @@ int parse(FILE*);
 char toHex(char);
 int decode();
 void clearFlags();
-
-
-
-
-
