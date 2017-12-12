@@ -1,4 +1,4 @@
-#include"y86.h"
+#include"y86_AKR.h"
 #define FALSE 0
 #define TRUE 1
 
@@ -56,16 +56,18 @@ int parse(FILE * f)
     else
     { /* c0af   c 0af  c0 af  c0a f */
         printf("Opened input file\n");
-        while ((c = fgetc(f)) != EOF )
-        {
-            char t = fgetc(f);
-            printf("%c\n", t);
-            c = toHex(c);
-            t = toHex(t);
-            p[i] = c<<4 | t;
-            i++; programLength++;
-            printf("%x ", p[i] & 0xff);
-        }
+        fread(p, strlen(p)+1, 1, f);
+        fclose(f);
+        // while ((c = fgetc(f)) != EOF )
+        // {
+        //     char t = fgetc(f);
+        //     printf("%c\n", t);
+        //     c = toHex(c);
+        //     t = toHex(t);
+        //     p[i] = c<<4 | t;
+        //     i++; programLength++;
+        //     printf("%x ", p[i] & 0xff);
+        // }
         printf("End of input file\n");
     }
     printf("\n");
@@ -593,7 +595,7 @@ void printRegisters()
 */
 void error(char * words, int pc)
 {
-    printf(words);
+    printf("%s\n", words);
     exit(1);
 }
 
@@ -857,7 +859,7 @@ int printMemory(int start)
     for (int i=start; i<start+words_on_screen; i++)
     {
         if (i==(0%4))
-            printf("");
+            printf("\n");
         printf("%x\t", p[i]);
     }
     return 0;
