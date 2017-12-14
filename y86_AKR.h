@@ -1,5 +1,7 @@
-/* y86 emulator - some bugs
-   Adam Bryant, 2015, Wright State University
+/*
+* Ashley Roselius
+* CEG 4350 Fall 2017
+* Project 3
 */
 
 #include<stdio.h>

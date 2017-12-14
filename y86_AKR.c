@@ -1,3 +1,9 @@
+/*
+* Ashley Roselius
+* CEG 4350 Fall 2017
+* Project 3
+*/
+
 #include"y86_AKR.h"
 #define FALSE 0
 #define TRUE 1
