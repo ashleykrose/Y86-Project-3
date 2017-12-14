@@ -711,6 +711,11 @@ void rmmovl(char reg, int offset)
 void mrmovl(char reg, int offset)
 {
     /* TO DO 6: Implement the mrmovl instruction */
+    int * rA = r1(reg);
+    int * rB = r2(reg);
+    p[*rB + offset] = *rA;
+    printf("rmmovl rA, %x(%x)", offset, *rA);
+    pc+=6;
 }
 
 /** Sets flags based on the last result */
@@ -735,18 +740,39 @@ void addl(char reg)
 void subl(char reg)
 {
     /* TO DO 8: Implement the subl instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    int tmp = *dst;
+    *dst = *dst - *src;
+    printf("subl rA, rB: (%x)", *dst);
+    setFlags(tmp, *src, *dst, 1);
+    pc+=2;
 }
 
 /**     andl rA, rB       62 rArB  */
 void andl(char reg)
 {
     /* TO DO 9: Implement the andl instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    int tmp = *dst;
+    *dst = *dst & *src;
+    printf("andl rA, rB: (%x)", *dst);
+    setFlags(tmp, *src, *dst, 2);
+    pc+=2;
 }
 
 /**     xorl rA, rB       63 rArB  */
 void xorl(char reg)
 {
     /* TO DO 10: Implement the xorl instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    int tmp = *dst;
+    *dst = *dst | *src;
+    printf("xorl rA, rB: (%x)", *dst);
+    setFlags(tmp, *src, *dst, 3);
+    pc+=2;
 }
 
 /**     jmp Dest          70 Da Db Dc Dd  */
@@ -762,12 +788,36 @@ void jmp(int dest)
 void jle(int dest)
 {
     /* TO DO 11: Implement the jle instruction */
+    printf("jle %x", dest);
+    if (getZF() == 1)
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else if (getSF() <= getOF())
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else
+    {
+        printf(" (not taken)");
+        pc+=5;
+    }
 }
 
 /**     jl Dest           72 Da Db Dc Dd  */
 void jl(int dest)
 {
     /* TO DO 12: Implement the jl instruction */
+    printf("jl %x", dest);
+    if (getSF() < getOF())
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else
+    {
+        printf(" (not taken)");
+        pc+=5;
+    }
 }
 
 /**     je Dest           73 Da Db Dc Dd  */
@@ -804,12 +854,36 @@ void jne(int dest)
 void jge(int dest)
 {
     /* TO DO 13: Implement the jge instruction */
+    printf("jge %x", dest);
+    if (getSF() >= getOF())
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else
+    {
+        printf(" (not taken)");
+        pc+=5;
+    }
 }
 
 /**     jg Dest           76 Da Db Dc Dd  */
 void jg(int dest)
 {
     /* TO DO jg: Implement the jg instruction */
+    printf("jle %x", dest);
+    if (getZF() == 0)
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else if (getSF() > getOF())
+    {
+        pc = dest;
+        printf(" (pc=%x)", pc&0xff);
+    } else
+    {
+        printf(" (not taken)");
+        pc+=5;
+    }
 }
 
 /* TO DO 15: Verify all the other instructions work correctly */
