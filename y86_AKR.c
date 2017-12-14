@@ -633,7 +633,7 @@ void cmovle(char reg)
 {
     int * src = r1(reg);
     int * dst = r2(reg);
-    if (getZF() || getSF() != getOF())
+    if (getZF() == 1 || getSF() != getOF())
     {
         *dst = *src;
         printf("cmovle %x, %x (moved)", *src, *dst);
@@ -674,18 +674,45 @@ void cmove(char reg)
 void cmovne(char reg)
 {
     /* TO DO 3: Implement the cmovne instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    if (getZF() == 0)
+    {
+        *dst = *src;
+        printf("cmove %x, %x (moved)", *src, *dst);
+    } else
+        printf("cmove %x, %x (not moved)", *src, *dst);
+    pc+=2;
 }
 
 /**     cmovge rA, rB     25 rArB  */
 void cmovge(char reg)
 {
     /* TO DO 4: Implement the cmovge instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    if (getSF() == getOF())
+    {
+        *dst = *src;
+        printf("cmove %x, %x (moved)", *src, *dst);
+    } else
+        printf("cmove %x, %x (not moved)", *src, *dst);
+    pc+=2;
 }
 
 /*     cmovg rA, rB      26 rArB   */
 void cmovg(char reg)
 {
     /* TO DO 5: Implement the cmovg instruction */
+    int * src = r1(reg);
+    int * dst = r2(reg);
+    if (getZF() == 0 && getSF() == 0)
+    {
+        *dst = *src;
+        printf("cmove %x, %x (moved)", *src, *dst);
+    } else
+        printf("cmove %x, %x (not moved)", *src, *dst);
+    pc+=2;
 }
 
 /**     irmovl V, rb      30 FrB Va Vb Vc Vd  */
@@ -722,6 +749,7 @@ void mrmovl(char reg, int offset)
 void setFlags(int a, int b, int result, int isAdd)
 {
     /* TO DO 7: Implement the setFlags function */
+
 }
 
 /**     addl rA, rB          60 rArB  */
@@ -789,11 +817,7 @@ void jle(int dest)
 {
     /* TO DO 11: Implement the jle instruction */
     printf("jle %x", dest);
-    if (getZF() == 1)
-    {
-        pc = dest;
-        printf(" (pc=%x)", pc&0xff);
-    } else if (getSF() <= getOF())
+    if (getZF() == 1 || getSF() != getOF())
     {
         pc = dest;
         printf(" (pc=%x)", pc&0xff);
@@ -809,7 +833,7 @@ void jl(int dest)
 {
     /* TO DO 12: Implement the jl instruction */
     printf("jl %x", dest);
-    if (getSF() < getOF())
+    if (getSF() != getOF())
     {
         pc = dest;
         printf(" (pc=%x)", pc&0xff);
@@ -855,7 +879,7 @@ void jge(int dest)
 {
     /* TO DO 13: Implement the jge instruction */
     printf("jge %x", dest);
-    if (getSF() >= getOF())
+    if (getSF() == getOF())
     {
         pc = dest;
         printf(" (pc=%x)", pc&0xff);
@@ -871,11 +895,7 @@ void jg(int dest)
 {
     /* TO DO jg: Implement the jg instruction */
     printf("jle %x", dest);
-    if (getZF() == 0)
-    {
-        pc = dest;
-        printf(" (pc=%x)", pc&0xff);
-    } else if (getSF() > getOF())
+    if (getZF() == 0 && getSF() == 0)
     {
         pc = dest;
         printf(" (pc=%x)", pc&0xff);
