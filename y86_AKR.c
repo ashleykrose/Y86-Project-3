@@ -100,7 +100,7 @@ int decode()
     it does now
     */
 
-    for (pc=0; pc<programLength; )
+    for (pc=0; pc<programLength; pc++)
     {
         printf("\n0x%x:\t ", pc&0xff);
         char a = p[pc] & 0xf0;
@@ -749,7 +749,34 @@ void mrmovl(char reg, int offset)
 void setFlags(int a, int b, int result, int isAdd)
 {
     /* TO DO 7: Implement the setFlags function */
-
+    clearFlags();
+    if (result >= 0){
+      setSF();
+    }
+    if (result == 0){
+      setZF();
+    }
+    if (isAdd == 1){
+      if (a >= 0 && b >= 0){
+        if (result < 0){
+          setOF();
+        }
+      } else if (a < 0 && b < 0){
+        if (result >=0){
+          setOF();
+        }
+      }
+    } else if (isAdd == 2){
+      if (a >= 0 && b < 0){
+        if (result < 0){
+          setOF();
+        }
+      } else if (a < 0 && b >=0){
+        if (result >= 0){
+          setOF();
+        }
+      }
+    }
 }
 
 /**     addl rA, rB          60 rArB  */
@@ -760,7 +787,7 @@ void addl(char reg)
     int tmp = *dst;
     *dst = *dst + *src;
     printf("addl rA, rB: (%x)", *dst);
-    setFlags(tmp, *src, *dst, 0);
+    setFlags(tmp, *src, *dst, 1);
     pc+=2;
 }
 
@@ -773,7 +800,7 @@ void subl(char reg)
     int tmp = *dst;
     *dst = *dst - *src;
     printf("subl rA, rB: (%x)", *dst);
-    setFlags(tmp, *src, *dst, 1);
+    setFlags(tmp, *src, *dst, 2);
     pc+=2;
 }
 
@@ -786,7 +813,7 @@ void andl(char reg)
     int tmp = *dst;
     *dst = *dst & *src;
     printf("andl rA, rB: (%x)", *dst);
-    setFlags(tmp, *src, *dst, 2);
+    setFlags(tmp, *src, *dst, 0);
     pc+=2;
 }
 
@@ -799,7 +826,7 @@ void xorl(char reg)
     int tmp = *dst;
     *dst = *dst | *src;
     printf("xorl rA, rB: (%x)", *dst);
-    setFlags(tmp, *src, *dst, 3);
+    setFlags(tmp, *src, *dst, 0);
     pc+=2;
 }
 
@@ -948,14 +975,23 @@ void popl(char reg)
 /* TO DO: 16: Make sure printMemory prints the ending memory on the screen properly */
 int printMemory(int start)
 {
-    int words_on_screen = 1000;
-
-    for (int i=start; i<start+words_on_screen; i++)
-    {
-        if (i==(0%4))
-            printf("\n");
-        printf("%x\t", p[i]);
+    int count = 0;
+    for (int i = 0; i < programLength; i++){
+      if (count == 3){
+        count = 0;
+        printf("\n");
+      }
+      printf("%x\t", p[i]);
+      count++;
     }
+    // int words_on_screen = 1000;
+    //
+    // for (int i=start; i<start+words_on_screen; i++)
+    // {
+    //     if (i==(0%4))
+    //         printf("\n");
+    //     printf("%x\t", p[i]);
+    // }
     return 0;
 }
 
